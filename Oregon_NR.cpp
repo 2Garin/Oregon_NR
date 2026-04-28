@@ -361,7 +361,7 @@ else
   // Не ждём второго, а переходм в режим анализа
   // Также не ждём второго пакета если отключён режим сращивания пакетов
   if (packet_number == 1 && (millis() - first_packet_end) > 200) receive_status = ANALIZE_PACKETS;
-  if (packet_number == 1 && (!is_assemble || ver != 2 || ver != 12 )) receive_status = ANALIZE_PACKETS;
+  if (packet_number == 1 && (!is_assemble || (ver != 2 && ver != 12))) receive_status = ANALIZE_PACKETS;
 
 
   //////////////////////////////////////////////////////////////////////
@@ -611,7 +611,7 @@ else
       //Захват пакета происходит тольок в случае, если найдена стартовая последовательность (нибл синхронизации)
       //Если не было синхрониблов - то не о чем вообще разговаривать
       if ( synchro_pos != 0xFFF && packet_number == 1)  captured = 1;
-      if ( (synchro_pos2 != 0xFFF || synchro_pos2 != 0xFFF) && packet_number == 2)  captured = 1;
+      if ( (synchro_pos != 0xFFF || synchro_pos2 != 0xFFF) && packet_number == 2)  captured = 1;
       //Захват куска посылки не считается
       if ((ver == 2 && read_tacts < 136) || (ver == 3 && read_tacts < 80))   captured = 0;
     }
@@ -1743,7 +1743,7 @@ int Oregon_NR::get_synchro_pos(byte* code, int p_ver) {
    return 1;
   }
 
-
+  return 0xFF; //неизвестная версия протокола — синхро-нибл не найден
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2175,7 +2175,7 @@ bool Oregon_NR::check_CRC(byte* oregon_data, word sens_type, byte* valid_data) {
   }
 
 
-#ifdef ADD_SENS_SUPPORT == 1
+#if ADD_SENS_SUPPORT == 1
 
   if ((sens_type & 0xFF00) == GAS || (sens_type & 0xFF00) == THP || (sens_type & 0xFF00) == FIRE || (sens_type & 0xFF00) == CURRENT  || (sens_type & 0xFF00) == CAPRAIN || (sens_type & 0xFF00) == UVS)
   {
